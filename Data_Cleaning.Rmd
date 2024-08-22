@@ -1,0 +1,349 @@
+---
+title: "EDA"
+author: "Szu-Tung Chen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the Data
+
+```{r}
+data = read.csv("WVS.csv")
+dim(data)
+```
+
+## Select the data we want
+
+```{r}
+df = subset(data, select = c("Q46P",
+                             "Q49",
+                             "Q260", "Q261", "Q262", "Q263", "Q264", "Q265", "Q266", "Q267", "Q268", "Q269",
+                             "Q270", "Q271", "Q272", "Q273", "Q274", "Q275", "Q276", "Q277", "Q278", "Q279",
+                             "Q280", "Q281", "Q282", "Q283", "Q284", "Q285", "Q286", "Q287P", "Q288", "Q289", "Q290"))
+write.csv(df, file = '33cols_row.csv', row.names = FALSE)
+```
+
+
+## Missing Value
+
+```{r}
+# Q46P
+df$Q46P[df$Q46P == -1] = NA
+df$Q46P[df$Q46P == -2] = NA
+df$Q46P[df$Q46P == -4] = NA
+df$Q46P[df$Q46P == -5] = NA
+# Q49
+df$Q49[df$Q49 == -1] = NA
+df$Q49[df$Q49 == -2] = NA
+df$Q49[df$Q49 == -4] = NA
+df$Q49[df$Q49 == -5] = NA
+# Q260
+df$Q260[df$Q260 == -1] = NA
+df$Q260[df$Q260 == -2] = NA
+df$Q260[df$Q260 == -4] = NA
+df$Q260[df$Q260 == -5] = NA
+# Q261
+df$Q261[df$Q261 == -1] = NA
+df$Q261[df$Q261 == -2] = NA
+df$Q261[df$Q261 == -4] = NA
+df$Q261[df$Q261 == -5] = NA
+# Q262
+df$Q262[df$Q262 == -1] = NA
+df$Q262[df$Q262 == -2] = NA
+df$Q262[df$Q262 == -4] = NA
+df$Q262[df$Q262 == -5] = NA
+# Q263
+df$Q263[df$Q263 == -1] = NA
+df$Q263[df$Q263 == -2] = NA
+df$Q263[df$Q263 == -4] = NA
+df$Q263[df$Q263 == -5] = NA
+# Q264
+df$Q264[df$Q264 == -1] = NA
+df$Q264[df$Q264 == -2] = NA
+df$Q264[df$Q264 == -4] = NA
+df$Q264[df$Q264 == -5] = NA
+df$Q264[df$Q264 == -3] = 3
+# Q265
+df$Q265[df$Q265 == -1] = NA
+df$Q265[df$Q265 == -2] = NA
+df$Q265[df$Q265 == -4] = NA
+df$Q265[df$Q265 == -5] = NA
+df$Q265[df$Q265 == -3] = 3
+# Q266
+df$Q266[df$Q266 == -1] = NA
+df$Q266[df$Q266 == -2] = NA
+df$Q266[df$Q266 == -4] = NA
+df$Q266[df$Q266 == -5] = NA
+# Q267
+df$Q267[df$Q267 == -1] = NA
+df$Q267[df$Q267 == -2] = NA
+df$Q267[df$Q267 == -4] = NA
+df$Q267[df$Q267 == -5] = NA
+# Q268
+df$Q268[df$Q268 == -1] = NA
+df$Q268[df$Q268 == -2] = NA
+df$Q268[df$Q268 == -4] = NA
+df$Q268[df$Q268 == -5] = NA
+# Q269
+df$Q269[df$Q269 == -1] = NA
+df$Q269[df$Q269 == -2] = NA
+df$Q269[df$Q269 == -4] = NA
+df$Q269[df$Q269 == -5] = NA
+# Q270
+df$Q270[df$Q270 == -1] = NA
+df$Q270[df$Q270 == -2] = NA
+df$Q270[df$Q270 == -4] = NA
+df$Q270[df$Q270 == -5] = NA
+# Q271
+df$Q271[df$Q271 == -1] = NA
+df$Q271[df$Q271 == -2] = NA
+df$Q271[df$Q271 == -4] = NA
+df$Q271[df$Q271 == -5] = NA
+# Q272
+df$Q272[df$Q272 == -1] = NA
+df$Q272[df$Q272 == -2] = NA
+df$Q272[df$Q272 == -4] = NA
+df$Q272[df$Q272 == -5] = NA
+# Q273
+df$Q273[df$Q273 == -1] = NA
+df$Q273[df$Q273 == -2] = NA
+df$Q273[df$Q273 == -4] = NA
+df$Q273[df$Q273 == -5] = NA
+# Q274
+df$Q274[df$Q274 == -1] = NA
+df$Q274[df$Q274 == -2] = NA
+df$Q274[df$Q274 == -4] = NA
+df$Q274[df$Q274 == -5] = NA
+# Q275
+df$Q275[df$Q275 == -1] = NA
+df$Q275[df$Q275 == -2] = NA
+df$Q275[df$Q275 == -4] = NA
+df$Q275[df$Q275 == -5] = NA
+# $276
+df$Q276[df$Q276 == -1] = NA
+df$Q276[df$Q276 == -2] = NA
+df$Q276[df$Q276 == -3] = NA
+df$Q276[df$Q276 == -4] = NA
+df$Q276[df$Q276 == -5] = NA
+# Q277
+df$Q277[df$Q277 == -1] = NA
+df$Q277[df$Q277 == -2] = NA
+df$Q277[df$Q277 == -3] = NA
+df$Q277[df$Q277 == -4] = NA
+df$Q277[df$Q277 == -5] = NA
+# 278
+df$Q278[df$Q278 == -1] = NA
+df$Q278[df$Q278 == -2] = NA
+df$Q278[df$Q278 == -3] = NA
+df$Q278[df$Q278 == -4] = NA
+df$Q278[df$Q278 == -5] = NA
+# Q279
+df$Q279[df$Q279 == -1] = NA
+df$Q279[df$Q279 == -2] = NA
+df$Q279[df$Q279 == -4] = NA
+df$Q279[df$Q279 == -5] = NA
+# Q280
+df$Q280[df$Q280 == -1] = NA
+df$Q280[df$Q280 == -2] = NA
+df$Q280[df$Q280 == -3] = NA
+df$Q280[df$Q280 == -4] = NA
+df$Q280[df$Q280 == -5] = NA
+# Q281
+df$Q281[df$Q281 == -1] = NA
+df$Q281[df$Q281 == -2] = NA
+df$Q281[df$Q281 == -3] = NA
+df$Q281[df$Q281 == -4] = NA
+df$Q281[df$Q281 == -5] = NA
+# Q282
+df$Q282[df$Q282 == -1] = NA
+df$Q282[df$Q282 == -2] = NA
+df$Q282[df$Q282 == -3] = NA
+df$Q282[df$Q282 == -4] = NA
+df$Q282[df$Q282 == -5] = NA
+# Q283
+df$Q283[df$Q283 == -1] = NA
+df$Q283[df$Q283 == -2] = NA
+df$Q283[df$Q283 == -3] = NA
+df$Q283[df$Q283 == -4] = NA
+df$Q283[df$Q283 == -5] = NA
+# Q284
+df$Q284[df$Q284 == -1] = NA
+df$Q284[df$Q284 == -2] = NA
+df$Q284[df$Q284 == -3] = 4
+df$Q284[df$Q284 == -4] = NA
+df$Q284[df$Q284 == -5] = NA
+# Q285
+df$Q285[df$Q285 == -1] = NA
+df$Q285[df$Q285 == -2] = NA
+df$Q285[df$Q285 == -4] = NA
+df$Q285[df$Q285 == -5] = NA
+# Q286
+df$Q286[df$Q286 == -1] = NA
+df$Q286[df$Q286 == -2] = NA
+df$Q286[df$Q286 == -4] = NA
+df$Q286[df$Q286 == -5] = NA
+# Q287
+df$Q287P[df$Q287P == -1] = NA
+df$Q287P[df$Q287P == -2] = NA
+df$Q287P[df$Q287P == -4] = NA
+df$Q287P[df$Q287P == -5] = NA
+# Q288
+df$Q288[df$Q288 == -1] = NA
+df$Q288[df$Q288 == -2] = NA
+df$Q288[df$Q288 == -4] = NA
+df$Q288[df$Q288 == -5] = NA
+# Q289
+df$Q289[df$Q289 == -1] = NA
+df$Q289[df$Q289 == -2] = NA
+df$Q289[df$Q289 == -4] = NA
+df$Q289[df$Q289 == -5] = NA
+# Q290
+df$Q290[df$Q290 == -1] = NA
+df$Q290[df$Q290 == -2] = NA
+df$Q290[df$Q290 == -4] = NA
+df$Q290[df$Q290 == -5] = NA
+```
+
+## deal with categorical data
+
+```{r}
+education = c("Early childhood education (ISCED 0) / no education",
+                    "Primary education (ISCED 1)",
+                    "Lower secondary education (ISCED 2)",
+                    "Upper secondary education (ISCED 3)",
+                    "Post-secondary non-tertiary education (ISCED 4)",
+                    "Short-cycle tertiary education (ISCED 5)",
+                    "Bachelor or equivalent (ISCED 6)",
+                    "Master or equivalent (ISCED 7)",
+                    "Doctoral or equivalent (ISCED 8)")
+employment = c("Full time (30 hours a week or more)",
+                "Part time (less than 30 hours a week)",
+                "Self employed",
+                "Retired/pensioned",
+                "Housewife not otherwise employed",
+                "Student",
+                "Unemployed",
+                "Other")
+occupation_group = c("Never had a job",
+                     "Professional and technical (for example: doctor, teacher, engineer, artist, accountant, nurse)",
+                     "Higher administrative (for example: banker, executive in big business, high government official, union official)",
+                     "Clerical (for example: secretary, clerk, office manager, civil servant, bookkeeper",
+                     "Sales (for example: sales manager, shop owner, shop assistant, insurance agent, buyer)",
+                     "Service (for example: restaurant owner, police officer, waitress, barber, caretaker)",
+                     "Skilled worker (for example: foreman, motor mechanic, printer, seamstress, tool and die maker, electrician)",
+                     "Semi-skilled worker (for example: bricklayer, bus driver, cannery worker, carpenter, sheet metal worker, baker)",
+                     "Unskilled worker (for example: labourer, porter, unskilled factory worker, cleaner)",
+                     "Farm worker (for example: farm labourer, tractor driver)",
+                     "farm owner, farm manager",
+                     "JP,KG,TJ: Other")
+# Q260
+df$Q260 = factor(df$Q260)
+levels(df$Q260) = c("Male", "Female")
+# Q263
+df$Q263 = factor(df$Q263)
+levels(df$Q263) = c("I am born in this country",
+                    "I am an immigrant to this country (born outside this country)")
+# Q264
+df$Q264 = factor(df$Q264)
+levels(df$Q264) = c("Not an immigrant", "Immigrant", "INAP; Mother does not live in country")
+# Q265
+df$Q265 = factor(df$Q265)
+levels(df$Q265) = c("Not an immigrant", "Immigrant", "INAP; Father does not live in country")
+# Q266-268
+df$Q266 = factor(df$Q266)
+df$Q267 = factor(df$Q267)
+df$Q268 = factor(df$Q268)
+# Q269
+df$Q269 = factor(df$Q269)
+levels(df$Q269) = c("Yes, I am a citizen of this country",
+                    "Not, I am not a citizen of this country",
+                    "SWI2: Applied, awaiting decision")
+# Q271
+df$Q271 = factor(df$Q271)
+levels(df$Q271) = c("No",
+                    "Yes, own parent(s)",
+                    "Yes, parent(s) in law",
+                    "Yes, both own parent(s) and parent(s) in law")
+# Q272
+df$Q272 = factor(df$Q272)
+# Q273
+df$Q273 = factor(df$Q273)
+levels(df$Q273) = c("Married",
+                    "Living together as married",
+                    "Divorced",
+                    "Separated",
+                    "Widowed",
+                    "Single")
+# Q275
+df$Q275 = factor(df$Q275)
+levels(df$Q275) = education
+# Q276
+df$Q276 = factor(df$Q276)
+levels(df$Q276) = education
+# Q277
+df$Q277 = factor(df$Q277)
+levels(df$Q277) = education
+# Q278
+df$Q278 = factor(df$Q278)
+levels(df$Q278) = education
+# Q279-280
+df$Q279 = factor(df$Q279)
+levels(df$Q279) = employment
+df$Q280 = factor(df$Q280)
+levels(df$Q280) = employment
+# Q281-283
+df$Q281 = factor(df$Q281)
+levels(df$Q281) = occupation_group
+df$Q282 = factor(df$Q282)
+levels(df$Q282) = occupation_group
+df$Q283 = factor(df$Q283)
+levels(df$Q283) = occupation_group
+# Q284
+df$Q284 = factor(df$Q284)
+levels(df$Q284) = c("Government or public institution",
+                    "Private business or industry",
+                    "Private non-profit organization",
+                    "Not applicable; Never had a job")
+# Q285
+df$Q285 = factor(df$Q285)
+levels(df$Q285) = c("Yes", "No")
+# Q286
+df$Q286 = factor(df$Q286)
+summary(df$Q286)
+levels(df$Q286) = c("Save money",
+                    "Just get by",
+                    "Spent some savings and borrowed money",
+                    "Spent savings and borrowed money")
+# Q287
+df$Q287P = factor(df$Q287P)
+levels(df$Q287P) = c("Upper class",
+                    "Upper middle class",
+                    "Lower middle class",
+                    "Working class",
+                    "Lower class")
+# Q289
+df$Q289 = factor(df$Q289)
+levels(df$Q289) = c("Do not belong to a denomination",
+                    "Roman Catholic",
+                    "Protestant",
+                    "Orthodox (Russian/Greek/etc.)",
+                    "Jew",
+                    "Muslim",
+                    "Hindu",
+                    "Buddhist",
+                    "Other Christian (Evangelical/Pentecostal/Fee church/etc.)",
+                    "Other")
+df$Q290 = factor(df$Q290)
+```
+
+```{r}
+df <- df[complete.cases(df), ]
+# summary(df)
+write.csv(df, file = 'cleaned.csv', row.names = FALSE)
+```
+
+

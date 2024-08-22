@@ -1,0 +1,128 @@
+---
+title: "Data_Analysis"
+author: "Szu-Tung Chen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(warn=-1)
+```
+
+## Read Cleaned File
+
+```{r}
+library(MASS)
+library(dplyr)
+library(nnet)
+USA = read.csv("USA.csv")
+White = subset(USA, Q290 == 840001)
+```
+
+#summary gender
+```{r }
+library(ggplot2)
+ggplot(White, aes(x=Q260, y=Q49, fill=Q260)) + geom_boxplot()
+```
+
+#EDA
+```{r }
+#female <- subset(White, Q260=="Female")
+#male <- subset(White, Q260=="Male")
+#ggplot(female, aes(x=Q261)) + geom_histogram(color="")
+ggplot(White, aes(x=Q262, fill=Q260, color=Q260)) +
+  geom_histogram(position="identity") +
+  facet_grid(Q260 ~ .)
+ggplot(White, aes(x=Q262, y=Q49, color=Q260, shape=Q260)) + geom_point()
+ggplot(White, aes(x=Q262, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q274, y=Q49, color=Q260, shape=Q260)) + geom_point()
+```
+
+```{r }
+White$Q263 <- as.factor(White$Q263)
+levels(White$Q263) <- c("Is Immigrant", "Not an Immigrant")
+White$Q269 <- as.factor(White$Q269)
+levels(White$Q269) <- c("Not a Citizen", "Is Citizen")
+ggplot(White, aes(x=Q263, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q269, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+White$Q270 <- as.factor(White$Q270)
+ggplot(White, aes(x=Q270, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q271, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q274 <- as.factor(White$Q274)
+ggplot(White, aes(x=Q274, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+White$Q288 <- as.factor(White$Q288)
+ggplot(White, aes(x=Q288, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+```
+
+```{r }
+White$Q272 <- as.factor(White$Q272)
+levels(White$Q272) <- c("English", "Spanish; Castilian", "Other")
+ggplot(White, aes(x=Q272, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q273, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+White$Q275 <- as.factor(White$Q275)
+levels(White$Q275) <- c("ISCED 2", "ISCED 3", "ISCED 4", "ISCED 5", "ISCED 6", "ISCED 7", "ISCED 8")
+ggplot(White, aes(x=Q275, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q279 <- as.factor(White$Q279)
+levels(White$Q279) <- c("Full time", "Part time", "Self employed")
+ggplot(White, aes(x=Q279, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+White$Q281 <- as.factor(White$Q281)
+levels(White$Q281) <- c("Clerical", "farm owner/manager", "Higher administrative", "JP,KG,TJ: Other", "Professional and technical", "Sales", "Semi-skilled worker", "Service", "Skilled worker", "Unskilled worker")
+ggplot(White, aes(x=Q281, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q284, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q285, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q286, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q287P, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q289 <- as.factor(White$Q289)
+levels(White$Q289) <- c("Buddhist", "Do not belong to a denomination", "Jew", "Orthodox", "Other", "Other Christian", "Protestant", "Roman Catholic")
+ggplot(White, aes(x=Q289, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+```
+
+```{r }
+ggplot(White, aes(x=Q264, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+ggplot(White, aes(x=Q265, y=Q49, fill=Q260)) + geom_boxplot() + facet_wrap(Q260 ~ .)
+White$Q266 <- as.factor(White$Q266)
+levels(White$Q266) <- c("Canada", "Germany", "Guinea", "Italy", "Spain", "United Kingdom", "United States")
+ggplot(White, aes(x=Q266, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q267 <- as.factor(White$Q267)
+levels(White$Q267) <- c("Virgin Islands (British)", "Canada", "El Salvador", "Germany", "Iran", "Israel", "Italy", "Mexico", "Russia", "Switzerland", "Turkey", "United Kingdom", "United States")
+ggplot(White, aes(x=Q267, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q268 <- as.factor(White$Q268)
+levels(White$Q268) <- c("Canada", "Colombia", "Czech Rep.", " France", "Iran", "Ireland", "Italy", "Poland", "Switzerland", "United Kingdom", "United States")
+ggplot(White, aes(x=Q268, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q282 <- as.factor(White$Q282)
+levels(White$Q282) <- c("Clerical", "farm worker", "Higher administrative", "Never had a job", "Professional and technical", "Sales", "Semi-skilled worker", "Service", "Skilled worker", "Unskilled worker")
+ggplot(White, aes(x=Q282, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap
+White$Q283 <- as.factor(White$Q283)
+levels(White$Q283) <- c("Clerical", "farm owner/manager", "farm worker", "Higher administrative", "Never had a job", "Professional and technical", "Sales", "Semi-skilled worker", "Service", "Skilled worker", "Unskilled worker")
+ggplot(White, aes(x=Q283, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q276 <- as.factor(White$Q276)
+levels(White$Q276) <- c("ISCED 6", "ISCED 8", "ISCED 2", "ISCED 7", "ISCED 4", "ISCED 5", "ISCED 3")
+White$Q276 <- as.character(White$Q276)
+ggplot(White, aes(x=Q276, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q277 <- as.factor(White$Q277)
+levels(White$Q277) <- c("ISCED 6", "ISCED 8", "ISCED 2", "ISCED 7", "ISCED 4", "ISCED 5", "ISCED 3")
+White$Q277 <- as.character(White$Q277)
+ggplot(White, aes(x=Q277, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q278 <- as.factor(White$Q278)
+levels(White$Q278) <- c("ISCED 6", "ISCED 8", "ISCED 0", "ISCED 2", "ISCED 7", "ISCED 4", "ISCED 5", "ISCED 3")
+White$Q278 <- as.character(White$Q278)
+ggplot(White, aes(x=Q278, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 30)) + facet_wrap(Q260 ~ .)
+White$Q280 <- as.factor(White$Q280)
+levels(White$Q280) <- c("Full time", "Part time", "Self employed")
+ggplot(White, aes(x=Q280, y=Q49, fill=Q260)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 0)) + facet_wrap(Q260 ~ .)
+```
+
+```{r }
+female$Q278 <- as.factor(female$Q278)
+summary(female$Q278)
+male$Q278 <- as.factor(male$Q278)
+summary(male$Q278)
+```
+
+```{r}
+female <- subset(White, Q260=="Female")
+male <- subset(White, Q260=="Male")
+summary(male$Q276)
+summary(female$Q276)
+```

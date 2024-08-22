@@ -1,0 +1,342 @@
+---
+title: "Data_Analysis"
+author: "Szu-Tung Chen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(warn=-1)
+```
+
+## Read Cleaned File
+
+```{r message=FALSE}
+set.seed(1450)
+library(MASS)
+library(dplyr)
+library(nnet)
+library(ggplot2)
+library(quantreg)
+USA = read.csv("USA.csv")
+
+White = subset(USA, Q290 == 840001)
+```
+
+## data processing
+
+```{r}
+df = White
+df = subset(df, Q260=="Male")
+
+df = subset(df, select = -c(Q261, Q263, Q46P, Q269, Q271, Q272, Q264, Q265, Q260, Q290, Q266, Q267, Q268,Q289))
+
+hist(df$Q49)
+abline(v=mean(df$Q49), col="red")
+
+factorize = function(df_temp){
+  df_temp[] = lapply(df_temp, function(x) if(is.character(x)) factor(x) else x)
+  return(df_temp)
+}
+
+continue = TRUE
+while (continue){
+  n = nrow(df)
+  train_indices = sample(1:n, 220)
+  train_df = df[train_indices, ]
+  test_df = df[-train_indices, ]
+  train_df = factorize(train_df)
+  test_df = factorize(test_df)
+  
+  check = 0
+  for (col_name in colnames(df)) {
+    if (is.factor(df[[col_name]])) {
+      if (levels(test_df[[col_name]]) %in% levels(train_df[[col_name]])){
+        check = 1 # need to resample
+      }
+    }
+  }
+  if (check == 0){continue = FALSE}
+}
+summary(train_df)
+```
+
+### Fit Full Model & Check Assumption
+
+```{r}
+full_model = lm(Q49 ~ ., data=train_df)
+
+# Normality Assumption
+qqnorm(full_model$residuals, ylab="Residuals")
+qqline(full_model$residual)
+# Check Mean Model and Constant Variance
+plot(full_model$fitted, full_model$residual, xlab="Fitted",ylab="Residuals")
+abline(h=0)
+plot(full_model$fitted, abs(full_model$residual), xlab="Fitted",ylab="|Residuals|")
+abline(h=0)
+
+shapiro.test(full_model$residual)
+
+```
+# Unusual Points
+```{r}
+# Leverage Point
+hatv = hatvalues(full_model)
+library(faraway)
+halfnorm(hatv, nlab = 0, ylabs = "Leverages")
+which(hatv>0.99) 
+# Cook's distance
+cook <- cooks.distance(full_model)
+halfnorm(cook, nlab = 0, ylab="Cook’s distance")
+cook_update = lm(Q49 ~ ., train_df, subset=(cook<0.025))
+df = subset(train_df, cook<0.025)
+summary(cook_update)
+full_model = cook_update
+
+shapiro.test(full_model$residual)
+# Normality Assumption
+qqnorm(full_model$residuals, ylab="Residuals")
+qqline(full_model$residual)
+# Check Mean Model and Constant Variance
+plot(full_model$fitted, full_model$residual, xlab="Fitted",ylab="Residuals")
+abline(h=0)
+plot(full_model$fitted, abs(full_model$residual), xlab="Fitted",ylab="|Residuals|")
+abline(h=0)
+```
+
+
+
+# Model Selection
+
+```{r, message=FALSE, warning=FALSE}
+
+# # Check Colinearity
+# X = model.matrix(full_model)[, -1]
+# which(vif(X) >10)
+# summary(full_model)
+# forward selection
+library(olsrr)
+ols_step_backward_p(full_model, prem=0.05, details=FALSE)
+ols_step_forward_p(full_model, pent=0.05, details=FALSE)
+ols_step_both_p(full_model, pent=0.05, prem=0.05, details=FALSE)
+# adjusted R square
+# library(leaps)
+# b = regsubsets(df$Q49 ~ ., df, really.big=T)
+# rs = summary(b)
+# which.max(rs$adjr2) - 1
+```
+
+
+### check interaction terms
+
+```{r}
+check_interaction_significance <- function(model) {
+  # Get the summary of the model
+  summary_model <- summary(model)
+  
+  # Extract p-values
+  p_values <- coef(summary_model)[, "Pr(>|t|)"]
+  
+  # Set the significance level
+  significance_level <- 0.0001
+  
+  # Find interaction terms and check if any are significant
+  interaction_terms <- grep(":", names(p_values))
+  any(p_values[interaction_terms] < significance_level)
+}
+
+check_list = c("Q49", "Q266", "Q267", "Q268", "Q272")
+total_variable_names = names(train_df)
+selected_variable_names = c("Q285", "Q288", "Q286", "Q282")
+significant_pairs = list()
+
+# Remove variables in check_list from variable_names
+variable_names = setdiff(total_variable_names, check_list)
+
+for (i in 1:(length(variable_names) - 1)) {
+  for (j in (i + 1):length(variable_names)) {
+    if (j<=i) { break }
+    var1 = variable_names[i]
+    var2 = variable_names[j]
+
+    mod = lm(Q49 ~ get(var1) * get(var2), data = train_df)
+    if (check_interaction_significance(mod)) {
+      cat("var1 =", var1, "var2 =", var2, "\n")
+      significant_pairs[[length(significant_pairs) + 1]] = paste(var1, var2, sep=":")
+    }
+  }
+}
+
+new_model_formula = paste("Q49 ~ . +", paste(significant_pairs, collapse=" + "))
+new_model = lm(as.formula(new_model_formula), data = train_df)
+summary = summary(new_model)
+summary
+
+```
+
+
+
+## Aggregate Q275
+```{r}
+levels(train_df$Q275)
+levels(train_df$Q275) = c("UG", "Master", "secondary", "Doctoral", "ISCED4", "ISCED5", "secondary")
+
+model275 = lm(as.formula(new_model_formula), data = train_df)
+anova(new_model, model275)
+summary(model275)$r.square
+summary(model275)$adj.r.square
+new_model = model275
+```
+
+Aggregated Model is Acceptable
+
+## Aggregate Q281
+```{r}
+levels(train_df$Q281)
+levels(train_df$Q281) = c("Clerical",
+                          "Other",
+                          "Higher administrative",
+                          "Other",
+                          "Professional and technical",
+                          "Sales",
+                          "Other",
+                          "Service",
+                          "Skilled worker",
+                          "Other")
+model281 = lm(as.formula(new_model_formula), data = train_df)
+anova(new_model, model281)
+summary(model281)$r.square
+summary(model281)$adj.r.square
+new_model = model281
+```
+
+Aggregated model is acceptable.
+
+
+## Aggrefate Q276
+
+```{r}
+levels(train_df$Q276)
+levels(train_df$Q276) = c("UG", "Grad", "secondary", "Grad", "ISCED45", "ISCED45", "secondary")
+model276 = lm(as.formula(new_model_formula), data = train_df)
+anova(new_model, model276)
+summary(model276)$r.square
+summary(model276)$adj.r.square
+new_model = model276
+```
+
+Aggregated Model is Acceptable
+
+# Aggregate Q282
+
+```{r}
+levels(train_df$Q282)
+levels(train_df$Q282) = c("Clerical",
+                          "Higher administrative",
+                          "Other",
+                          "Professional and technical",
+                          "Sales",
+                          "Other",
+                          "Service",
+                          "Other",
+                          "Other")
+model282 = lm(as.formula(new_model_formula), data = train_df)
+anova(new_model, model282)
+summary(model282)$r.square
+summary(model282)$adj.r.square
+new_model = model282
+```
+Aggregation is acceptable
+
+# Aggregate Q286
+```{r}
+temp_df = train_df
+levels(temp_df$Q286)
+levels(temp_df$Q286) = c("Just get by",
+                          "Save money",
+                          "borrow",
+                          "borrow")
+model286 = lm(as.formula(new_model_formula), data = temp_df)
+anova(new_model, model286)
+summary(model286)$r.square
+summary(model286)$adj.r.square
+```
+
+
+
+```{r}
+
+# Test-based selection
+reduced_model = lm(Q49 ~ Q275 + Q276+ Q281+
+    Q282 + Q286 + Q288 + Q275:Q281 + Q276:Q282 + Q282:Q286, train_df)
+anova(reduced_model, new_model)
+summary(reduced_model)$r.square
+summary(reduced_model)$adj.r.square
+summary(new_model)$r.square
+summary(new_model)$adj.r.square
+```
+## Aggregate Levels for Testing Data
+```{r}
+levels(test_df$Q275) = c("UG", "Doctoral", "Master", "ISCED4", "ISCED5", "secondary")
+levels(test_df$Q276) = c("UG", "Grad", "Grad", "ISCED45", "ISCED45", "secondary")
+levels(test_df$Q281) = c("Clerical", "Higher administrative", "Other", "Professional and technical", "Sales","Other", "Service", "Skilled worker", "Other")
+levels(test_df$Q282) = c("Clerical", "Higher administrative", "Professional and technical", "Sales","Other", "Service", "Other")
+```
+## Model Validation: Model Without Selection
+```{r warning=FALSE}
+# RMSE function
+rmse <- function(x,y){
+  print(y)
+  sqrt(mean((x-y)^2))
+}
+# Model Without Selection
+pred_new = as.data.frame(predict(new_model, newdata = test_df))
+pred_new[pred_new<=0] = 0
+pred_new[pred_new>=10] = 10
+
+rmse(new_model$fitted.values, train_df$Q49)
+rmse(pred_new[,], test_df$Q49)
+plot(test_df$Q49, pred_new[,], ylab="Predicted Life Satisfaction", xlab="Recorded Life Satisfaction")
+abline(0,1, col="red")
+abline(1.5,1, col="blue")
+abline(-1.5,1, col="blue")
+```
+
+## Model with selection
+```{r}
+pred_red = as.data.frame(predict(reduced_model, newdata = test_df))
+pred_red[pred_red<=0] = 0
+pred_red[pred_red>=10] = 10
+
+rmse(reduced_model$fitted.values, train_df$Q49)
+rmse(pred_red[,], test_df$Q49)
+plot(test_df$Q49, pred_red[,], ylab="Predicted Life Satisfaction", xlab="Recorded Life Satisfaction")
+abline(0,1, col="red")
+abline(1.5,1, col="blue")
+abline(-1.5,1, col="blue")
+```
+
+
+
+## plot interactions and main effects
+```{r}
+plot_df = train_df
+plot_df$y=reduced_model$fitted.values
+
+
+# which(coef(summary(reduced_model))[, "Pr(>|t|)"] < 0.05)
+# which(coef(summary(new_model))[, "Pr(>|t|)"] < 0.05)
+
+# interaction term Q275 Q281
+ggplot(plot_df, aes(x=Q275, y=y, fill=Q281)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 40)) + facet_wrap(Q281 ~ .)
+
+# interaction term Q276 Q282
+ggplot(plot_df, aes(x=Q276, y=y, fill=Q282)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 40)) + facet_wrap(Q282 ~ .)
+
+# interaction term Q282 Q286
+ggplot(plot_df, aes(x=Q282, y=y, fill=Q286)) + geom_boxplot() + scale_x_discrete(guide = guide_axis(angle = 40)) + facet_wrap(Q286 ~ .)
+```
+
+
+

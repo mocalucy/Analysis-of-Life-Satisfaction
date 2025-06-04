@@ -1,28 +1,50 @@
-# **USA Demographics Data Analysis Project**
+# 🧠 Analysis of Demographic and Socioeconomic Impacts on Life Satisfaction
 
-## **Overview**
+This project investigates the relationship between socioeconomic factors and life satisfaction, focusing specifically on subpopulations within the United States. It uses survey data to explore how race, gender, and demographic variables affect reported happiness and builds insights through exploratory and statistical analysis in R.
 
-This project is part of a course assignment focused on analyzing USA demographic data. The main objective was to clean the dataset and perform exploratory data analysis (EDA) to extract meaningful insights that could inform future data-driven decisions.
+---
 
-## **Project Structure**
+## 📂 Project Structure
 
-### 1. **Data Cleaning** (`Data_Cleaning.Rmd`)
-   - **Objective:** To clean and preprocess the raw USA demographic dataset.
-   - **Key Steps:**
-     - Addressed missing data through imputation techniques.
-     - Corrected data types to ensure consistency across the dataset.
-     - Removed duplicate entries and irrelevant features to streamline the data.
-     - Created new features that added value to the dataset, enhancing the subsequent analysis.
+| File | Description |
+|------|-------------|
+| `Data_Cleaning.Rmd` | Loads and preprocesses the original dataset, including filtering and renaming |
+| `USA_EDA.Rmd` | Conducts exploratory data analysis (EDA) for the full U.S. dataset |
+| `USA_White_F.Rmd` | Analyzes life satisfaction trends and factors for White females in the U.S. |
+| `USA_White_M.Rmd` | Analyzes life satisfaction trends and factors for White males in the U.S. |
 
-### 2. **Exploratory Data Analysis** (`USA_EDA.Rmd`)
-   - **Objective:** To explore the cleaned dataset and uncover key patterns and trends within the USA demographic data.
-   - **Key Analyses:**
-     - **Descriptive Statistics:** Provided a summary of key metrics such as mean, median, and standard deviation.
-     - **Visualization:** Used tools like histograms, scatter plots, and correlation matrices to visualize the data's distribution and relationships.
-     - **Outlier Detection:** Identified and addressed outliers that could have skewed the results.
-     - **Trend Analysis:** Investigated demographic trends over time and across different regions.
+---
 
-## **Results**
+## 🔍 Key Themes
 
-- **Data Cleaning:** Successfully cleaned and prepared the dataset, making it suitable for detailed analysis.
-- **EDA:** The analysis revealed significant trends in the demographic data, including [insert specific findings, e.g., population growth patterns, income distribution, etc.]. These insights provide a solid foundation for further research and data modeling.
+- Differences in life satisfaction across race and gender
+- Socioeconomic predictors such as income, education, and employment
+- Comparative analysis of White females vs. White males in the U.S.
+- Visualizations of distributions and group comparisons
+
+---
+
+## 📦 Tools & R Packages Used
+
+- `tidyverse`
+- `ggplot2`
+- `dplyr`
+- `readr`
+- `psych`
+- `summarytools`
+
+---
+
+## 📈 How to Run
+
+1. Open each `.Rmd` file in **RStudio**
+2. Run them in order:
+   - `Data_Cleaning.Rmd`
+   - `USA_EDA.Rmd`
+   - `USA_White_F.Rmd`
+   - `USA_White_M.Rmd`
+
+To render as HTML/PDF:
+
+```r
+rmarkdown::render("USA_White_F.Rmd")
